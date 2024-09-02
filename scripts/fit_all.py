@@ -30,4 +30,6 @@ logger.setLevel(logging.INFO)
 for name, data in all_data_fits.items():
     data.fit(show=False)
 
+# all_data_fits["H2S_g"].fit(lower_temperature=0, upper_temperature=800)
+
 plt.show()

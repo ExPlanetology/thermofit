@@ -140,13 +140,32 @@ class FitDeltafG:
 
         return popt, r2, Delta_fG_pred
 
-    def fit(self, show: bool = False) -> None:
+    def fit(
+        self,
+        show: bool = False,
+        lower_temperature: float | None = None,
+        upper_temperature: float | None = None,
+    ) -> None:
         """Fits the data using the chosen functional form and plots the result.
 
         Args:
             show: Shows the plot
+            lower_temperature: Lower temperature of the fit. Defaults to None.
+            upper_temperature: Upper temperature of the fit. Defaults to None.
         """
-        popt, r2, Delta_fG_pred = self.fit_custom_function(self.T, self.Delta_fG)
+        if lower_temperature is not None and upper_temperature is not None:
+            indices = np.where((self.T >= lower_temperature) & (self.T <= upper_temperature))
+        elif lower_temperature is not None:
+            indices = np.where(self.T >= lower_temperature)
+        elif upper_temperature is not None:
+            indices = np.where(self.T <= upper_temperature)
+        else:
+            indices = np.arange(self.T.size)
+
+        T: npt.NDArray[np.float64] = self.T[indices]
+        Delta_fG: npt.NDArray[np.float64] = self.Delta_fG[indices]
+
+        popt, r2, Delta_fG_pred = self.fit_custom_function(T, Delta_fG)
 
         # Print R-squared value and fit parameters
         logger.info("%s R-squared value: %f", self.name, r2)
@@ -158,10 +177,8 @@ class FitDeltafG:
         _, ax = plt.subplots()
 
         # Plotting
-        ax.scatter(self.T, self.Delta_fG, color="blue", label="Data")
-        ax.plot(
-            self.T, Delta_fG_pred, color="red", label=f"Fit with {self.fitting_function.__name__}"
-        )
+        ax.scatter(T, Delta_fG, color="blue", label="Data")
+        ax.plot(T, Delta_fG_pred, color="red", label=f"Fit with {self.fitting_function.__name__}")
         ax.set_xlabel("Temperature (K)")
         ax.set_ylabel("Delta fG (kJ/mol)")
         ax.set_title(f"Fit of Delta fG for {self.name} with {self.fitting_function.__name__}")
@@ -181,7 +198,7 @@ H2O_g: FitDeltafG = FitDeltafG("H2O", "g")
 # Replacement fixes a sign error in JANAF
 H2O_l: FitDeltafG = FitDeltafG("H2O", "l", replacements={380: -224.102})
 # FIXME: Bad fit
-# H2S_g: FitDeltafG = FitDeltafG("H2S", "g")
+H2S_g: FitDeltafG = FitDeltafG("H2S", "g")
 # N2_g is reference
 NH3_g: FitDeltafG = FitDeltafG("H3N", "g")
 # O2_g is reference
@@ -199,7 +216,7 @@ all_data_fits: dict[str, FitDeltafG] = {
     "CO2": CO2_g,
     "H2O_g": H2O_g,
     "H2O_l": H2O_l,
-    # "H2S_g": H2S_g,
+    "H2S_g": H2S_g,
     "NH3_g": NH3_g,
     # "S2_g": S2_g,
     # "SO_g": SO_g,
