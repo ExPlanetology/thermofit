@@ -198,7 +198,7 @@ H2O_g: FitDeltafG = FitDeltafG("H2O", "g")
 # Replacement fixes a sign error in JANAF
 H2O_l: FitDeltafG = FitDeltafG("H2O", "l", replacements={380: -224.102})
 # FIXME: Bad fit
-H2S_g: FitDeltafG = FitDeltafG("H2S", "g")
+# H2S_g: FitDeltafG = FitDeltafG("H2S", "g")
 # N2_g is reference
 NH3_g: FitDeltafG = FitDeltafG("H3N", "g")
 # O2_g is reference
@@ -216,7 +216,7 @@ all_data_fits: dict[str, FitDeltafG] = {
     "CO2": CO2_g,
     "H2O_g": H2O_g,
     "H2O_l": H2O_l,
-    "H2S_g": H2S_g,
+    # "H2S_g": H2S_g,
     "NH3_g": NH3_g,
     # "S2_g": S2_g,
     # "SO_g": SO_g,
